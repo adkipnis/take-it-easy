@@ -9,17 +9,17 @@ import numpy as np
 class TIE():
 # Initialization    
     def __init__(self):
-        # setup fields
+        # Fields
         field_full = np.array([(i,j) for i in range(5) for j in range(5)])
         empty_idx = [3, 4, 9, 19, 23, 24]
-        self.field_orig = np.delete(field_full, empty_idx, axis=0)
+        self.field_orig = np.delete(field_full, empty_idx, axis = 0)
         self.field = self.field_orig.copy()
         
-        #diagonals
-        self.diag_r = [self.field[self.field[:,0]==i] for i in range(5)]
-        self.diag_l = [self.field[self.field[:,1]==i] for i in range(5)]
+        # Diagonals
+        self.diag_r = [self.field[self.field[:,0] == i] for i in range(5)]
+        self.diag_l = [self.field[self.field[:,1] == i] for i in range(5)]
         
-        # columns
+        # Columns
         c_1 = np.array([[i,0] for i in range(2,5)])
         c_2 = np.concatenate(([[1,0]], [[i,1] for i in range(2,5)]))
         c_3 = np.concatenate(([[i,i] for i in range(3)], [[3,2], [4,2]]))
@@ -27,13 +27,13 @@ class TIE():
         c_5 = np.array([[0+i,3+i] for i in range(3)])
         self.cols = [c_1, c_2, c_3, c_4, c_5]
         
-        # setup cards:
+        # Cards
         set_u = {1,5,9}
         set_l = {2,6,7}
         set_r = {3,4,8}
         self.deck = np.array([(i) for i in it.product(set_u, set_l, set_r)])
         
-        # rest
+        # Rest
         self.limbo = []
         self.placed = []
         self.score = 0
@@ -44,7 +44,7 @@ class TIE():
             choice_idx = np.random.choice(len(self.deck), 1)
             self.limbo = self.deck[choice_idx]
             self.show_drawn()
-            self.deck = np.delete(self.deck, choice_idx, axis=0)
+            self.deck = np.delete(self.deck, choice_idx, axis = 0)
         else:
             print("You must first place your drawn card")
     
@@ -54,15 +54,13 @@ class TIE():
         
     def place_card(self, pos = None):
         assert len(self.field) > 0, "No more cards to draw."
-        
         if pos is None:
             pos = self.random_pos()
         print("Position:", pos[0])
-        
         if pos in self.field:
             self.field = np.delete(
                 self.field,
-                np.argwhere(np.all(pos == self.field, axis=1)),
+                np.argwhere(np.all(pos == self.field, axis = 1)),
                 axis=0)
             self.placed.append((self.limbo[0], pos[0]))
             self.limbo = []
@@ -85,15 +83,15 @@ class TIE():
             for turn in self.placed:
                 if np.any(np.all(turn[1] == col, axis = 1)):
                     streak.append(turn[0][number_idx])
-            if len(np.unique(streak))==1:
+            if len(np.unique(streak)) == 1:
                 bar_score += np.sum(streak)
         print("Points:", bar_score) 
         self.score += bar_score
          
     def eval_score(self):
-        self.eval_streak(self.cols, number_idx = 0)
-        self.eval_streak(self.diag_l, number_idx = 1)
-        self.eval_streak(self.diag_r, number_idx = 2)
+        self.eval_streak(self.cols, 0)
+        self.eval_streak(self.diag_l, 1)
+        self.eval_streak(self.diag_r, 2)
         print("Points total:", self.score) 
 
 # Getter functioins      
