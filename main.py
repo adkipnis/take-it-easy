@@ -9,22 +9,29 @@ import numpy as np
 class TIE():
 # Initialization    
     def __init__(self):
-        # Fields
+        # Field (Hexagons)
         field_full = np.array([(i,j) for i in range(5) for j in range(5)])
         empty_idx = [3, 4, 9, 19, 23, 24]
         self.field_orig = np.delete(field_full, empty_idx, axis = 0)
         self.field = self.field_orig.copy()
         
-        # Diagonals
+        # Left Diagonals
+        l_1 = np.array([[i,0] for i in range(3)])
+        l_2 = np.concatenate(([[i,1] for i in range(3)], [[3,0]]))
+        l_3 = np.concatenate(([[i,2] for i in range(3)], [[3,1], [4,0]]))
+        l_4 = np.concatenate(([[i,3] for i in range(1,3)], [[3,2], [4,1]]))
+        l_5 = np.array([[2+i,4-i] for i in range(3)])
+        self.diag_l = [l_1, l_2, l_3, l_4, l_5]
+        
+        # Right Diagonals
         self.diag_r = [self.field[self.field[:,0] == i] for i in range(5)]
-        self.diag_l = [self.field[self.field[:,1] == i] for i in range(5)]
         
         # Columns
         c_1 = np.array([[i,0] for i in range(2,5)])
         c_2 = np.concatenate(([[1,0]], [[i,1] for i in range(2,5)]))
         c_3 = np.concatenate(([[i,i] for i in range(3)], [[3,2], [4,2]]))
-        c_4 = np.array([[0+i,1+i] for i in range(4)])
-        c_5 = np.array([[0+i,3+i] for i in range(3)])
+        c_4 = np.concatenate(([[0+i,1+i] for i in range(3)], [[3,3]]))
+        c_5 = np.array([[0+i,2+i] for i in range(3)])
         self.cols = [c_1, c_2, c_3, c_4, c_5]
         
         # Cards
@@ -76,13 +83,14 @@ class TIE():
             self.single_round()
 
 # Evaluation   
-    def eval_streak(self, bar, number_idx):
+    def eval_streak(self, bars, number_idx):
         bar_score = 0
-        for col in bar:
+        for bar in bars:
             streak = []
             for turn in self.placed:
-                if np.any(np.all(turn[1] == col, axis = 1)):
+                if np.any(np.all(turn[1] == bar, axis = 1)):
                     streak.append(turn[0][number_idx])
+            print(streak)        
             if len(np.unique(streak)) == 1:
                 bar_score += np.sum(streak)
         print("Points:", bar_score) 
